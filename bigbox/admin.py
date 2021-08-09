@@ -2,6 +2,8 @@ from django.contrib import admin
 from bigbox.models import Box, Category, Activity, Reason
 
 # Register your models here.
+
+
 @admin.register(Box)
 class BoxAdmin(admin.ModelAdmin):
     list_display = ['name', 'description', 'purchase_available']

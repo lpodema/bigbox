@@ -1,38 +1,29 @@
 from bigbox.models import Box, Activity
-import urllib
 from rest_framework import serializers
 from rest_framework.reverse import reverse
 
 
-class CustomHyperlinkedIdentityField(serializers.HyperlinkedIdentityField):
-    def get_url(self, obj, view_name, request, format):
-        from rest_framework.reverse import reverse
-        lookup_field_id = self.lookup_field + '_id'
-        lookup_field_value = getattr(obj, lookup_field_id, None)
-        result = '{}?{}'.format(
-            reverse(view_name, kwargs={}, request=request, format=format),
-            urllib.urlencode({self.lookup_field: lookup_field_value})
-        )
-        return result
-
-
 class ActivitySerializer(serializers.ModelSerializer):
     url = serializers.SerializerMethodField()
+
     def get_url(self, obj):
         request = self.context['request']
-        print(obj)
-        return reverse('bigbox:activity-detail', kwargs={'id': obj.box_set.first().pk, 'activity_id': obj.pk}, request=request)
+        box_id = request.resolver_match.kwargs.get('id', None)
+        return reverse('bigbox:activity-detail', kwargs={'id': box_id, 'activity_id': obj.pk}, request=request)
+
+    reasons = serializers.StringRelatedField(many=True)
+    category = serializers.StringRelatedField()
 
     class Meta:
         model = Activity
-        fields = ['pk', 'url', 'name', 'internal_name', 'description',
+        fields = ['url', 'name', 'internal_name', 'description',
                   'category', 'reasons', 'purchase_available']
 
 
 class ActivityNameSerializer(serializers.ModelSerializer):
     class Meta:
         model = Activity
-        fields = ['name', 'description']
+        fields = ['name']
 
 
 class BoxSerializer(serializers.ModelSerializer):
@@ -40,13 +31,10 @@ class BoxSerializer(serializers.ModelSerializer):
     category = serializers.StringRelatedField()
     activities = serializers.SerializerMethodField()
     activity = serializers.SerializerMethodField()
-    # def get_activity(self, obj):
-    #    activities = obj.activities.all()
-    #    return ActivitySerializer(activities, many=True).data
 
     def get_activity(self, obj):
         request = self.context['request']
-        return reverse('bigbox:activity-list', kwargs={'id':obj.id}, request=request)
+        return reverse('bigbox:activity-list', kwargs={'id': obj.id}, request=request)
 
     def get_url(self, obj):
         request = self.context['request']

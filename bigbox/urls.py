@@ -1,5 +1,4 @@
-from django.urls import include, path
-from rest_framework import renderers
+from django.urls import path
 from bigbox.views import BoxViewSet, ActivityViewSet
 from rest_framework.urlpatterns import format_suffix_patterns
 

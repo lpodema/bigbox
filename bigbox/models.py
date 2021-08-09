@@ -15,7 +15,8 @@ class CommonInfo(models.Model):
 
 
 class Reason(CommonInfo):
-    pass
+    def __str__(self):
+        return self.name
 
 
 class Category(CommonInfo):
