@@ -1,0 +1,3 @@
+CREATE USER admin_usr;
+CREATE DATABASE bigbox;
+GRANT ALL PRIVILEGES ON DATABASE bigbox TO admin_usr;
