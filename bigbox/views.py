@@ -1,3 +1,4 @@
+from django.http.response import Http404
 from django.shortcuts import get_object_or_404, render
 from rest_framework import viewsets, decorators
 from bigbox.models import Box, Activity
@@ -17,6 +18,7 @@ class MultipleFieldLookupMixin:
         queryset = self.filter_queryset(queryset)  # Apply any filter backends
         filter = {}
         for field in self.lookup_fields:
+            print( field)
             try:                                  # Get the result with one or more fields.
                 filter[field] = self.kwargs[field]
             except Exception:
@@ -30,7 +32,7 @@ class BoxViewSet(MultipleFieldLookupMixin, viewsets.ModelViewSet):
     serializer_class = BoxSerializer
     lookup_fields = ['id', 'slug']
 
-class ActivityViewSet(viewsets.ModelViewSet):
+class ActivityViewSet(MultipleFieldLookupMixin, viewsets.ModelViewSet):
     model = Activity
 
     def get_queryset(self):
@@ -38,15 +40,13 @@ class ActivityViewSet(viewsets.ModelViewSet):
             try:
                 qs = Box.objects.get(pk=self.kwargs["id"]).activities.all()
             except ObjectDoesNotExist:
-                pass
+                raise Http404
             if 'activity_id' in self.kwargs:
                 try:
-                    print(self.kwargs["id"], self.kwargs['activity_id'])
-                    qs = qs.get(id=self.kwargs["activity_id"])
-                    print(qs)
+                    qs = qs.filter(id=self.kwargs["activity_id"])
                     return qs
                 except ObjectDoesNotExist:
-                    pass
+                    raise Http404
             else:
                 return qs
         else:
@@ -54,4 +54,4 @@ class ActivityViewSet(viewsets.ModelViewSet):
     
     #queryset = Activity.objects.all()
     serializer_class = ActivitySerializer
-    lookup_field = 'activity_id'
+    lookup_fields = ['pk']
