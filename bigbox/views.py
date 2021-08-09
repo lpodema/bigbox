@@ -1,5 +1,5 @@
 from django.shortcuts import get_object_or_404, render
-from rest_framework import viewsets
+from rest_framework import viewsets, decorators
 from bigbox.models import Box, Activity
 from bigbox.serializers import BoxSerializer, ActivitySerializer
 from django.db.models import Prefetch
@@ -34,23 +34,24 @@ class ActivityViewSet(viewsets.ModelViewSet):
     model = Activity
 
     def get_queryset(self):
-        qs = Box.objects.all()
         if 'id' in self.kwargs:
             try:
-                qs = qs.get(pk=self.kwargs["id"]).activities.all()
+                qs = Box.objects.get(pk=self.kwargs["id"]).activities.all()
             except ObjectDoesNotExist:
                 pass
-            if 'pk' in self.kwargs:
+            if 'activity_id' in self.kwargs:
                 try:
-                    print(self.kwargs['pk'])
-                    qs = qs.get(id=self.kwargs["pk"])
+                    print(self.kwargs["id"], self.kwargs['activity_id'])
+                    qs = qs.get(id=self.kwargs["activity_id"])
+                    print(qs)
+                    return qs
                 except ObjectDoesNotExist:
                     pass
+            else:
+                return qs
         else:
-            qs = Activity.objects.all()
-        return qs
+            return Activity.objects.all()
     
-
     #queryset = Activity.objects.all()
     serializer_class = ActivitySerializer
-    lookup_field = ['pk']
+    lookup_field = 'activity_id'

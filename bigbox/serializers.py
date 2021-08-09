@@ -20,7 +20,8 @@ class ActivitySerializer(serializers.ModelSerializer):
     url = serializers.SerializerMethodField()
     def get_url(self, obj):
         request = self.context['request']
-        return reverse('bigbox:activity-detail', kwargs={'id': obj.id, 'pk': obj.pk}, request=request)
+        print(obj)
+        return reverse('bigbox:activity-detail', kwargs={'id': obj.box_set.first().pk, 'activity_id': obj.pk}, request=request)
 
     class Meta:
         model = Activity
@@ -37,9 +38,6 @@ class ActivityNameSerializer(serializers.ModelSerializer):
 class BoxSerializer(serializers.ModelSerializer):
     url = serializers.SerializerMethodField()
     category = serializers.StringRelatedField()
-
-    # activity = serializers.SerializerMethodField()
-
     activities = serializers.SerializerMethodField()
     activity = serializers.SerializerMethodField()
     # def get_activity(self, obj):
@@ -48,7 +46,7 @@ class BoxSerializer(serializers.ModelSerializer):
 
     def get_activity(self, obj):
         request = self.context['request']
-        return reverse('bigbox:activity-list', args=[obj.id], request=request)
+        return reverse('bigbox:activity-list', kwargs={'id':obj.id}, request=request)
 
     def get_url(self, obj):
         request = self.context['request']
@@ -57,9 +55,6 @@ class BoxSerializer(serializers.ModelSerializer):
     def get_activities(self, obj):
         activities = obj.activities.all()[:5]
         return ActivityNameSerializer(activities, many=True).data
-    # activities = ActivityNameSerializer(many=True)
-
-    # activities = ActivitySerializer(many=True)
 
     class Meta:
         model = Box

@@ -33,5 +33,5 @@ urlpatterns = format_suffix_patterns([
     path('<int:id>/', box_detail, name='box-detail'),
     path('<str:slug>/', box_detail, name='box-by-slug-list'),
     path('<int:id>/activity/', activity_list, name='activity-list'),
-    path('<int:id>/activity/<int:pk>/', activity_detail, name='activity-detail'),
+    path('<int:id>/activity/<int:activity_id>/', activity_detail, name='activity-detail'),
 ])
