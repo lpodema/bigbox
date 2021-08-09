@@ -1,15 +1,17 @@
 setup:
   addons:
-    plan: heroku-postgresql
-    as: db_bigbox
+    - plan: heroku-postgresql
+      as: db_bigbox
 
 build:
   docker:
-    backend: Dockerfile
+    web: Dockerfile
 
 release:
-  command: python manage.py migrate
-  image: backend
+  command:
+      - python manage.py migrate
+  image: web
 run:
-  backend: 
-    command: python manage.py runserver
+  web:
+    command:
+      - gunicorn bigbox_challenge.wsgi

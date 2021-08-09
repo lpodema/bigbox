@@ -1,1 +1,0 @@
-web: gunicorn bigbox_challenge.wsgi
